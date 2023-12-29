@@ -1,15 +1,22 @@
-#coding=utf8
 import requests
+from tqdm import tqdm
 
-f = open("D:/url.txt", "r")
-for line in f.readlines():
-	line = line.strip('\n')#忽略换行符
-	try:
-		res = requests.get(line,timeout=2)
-		if res.status_code == 200:
-			print(res.url + " " +str(res.status_code))
-		else:
-			pass
-	except:
-		pass
-f.close()
+
+def check_urls():
+    with open('url.txt', 'r') as f1:
+        urls = f1.readlines()
+    with open('url_live.txt', 'w') as f2:
+        for url in tqdm(urls, desc='Checking URLs'):
+            url = url.strip()
+            try:
+                response = requests.get(url, timeout=5)
+                if response.status_code == 200:
+                    f2.write(url + '\n')
+                    f2.flush()
+                    print(url + ' live!')
+            except requests.exceptions.Timeout:
+                print(f"Timeout while checking {url}.")
+            except:
+                pass
+
+check_urls()
